@@ -1,0 +1,26 @@
+plugins {
+  id "com.bmuschko.tomcat" version "2.1"
+}
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'war'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy:2.4.1'
+    compile 'com.amazonaws:aws-java-sdk-s3:1.9.22'
+
+    providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'junit:junit:4.12'
+
+    def tomcatVersion = '7.0.59'
+    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+           "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+           "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+}
