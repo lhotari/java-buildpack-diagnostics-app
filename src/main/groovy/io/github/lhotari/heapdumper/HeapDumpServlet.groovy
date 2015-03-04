@@ -1,6 +1,8 @@
 package io.github.lhotari.heapdumper
 
 import com.sun.management.HotSpotDiagnosticMXBean
+import org.springframework.cloud.Cloud
+import org.springframework.cloud.CloudFactory
 
 import javax.servlet.GenericServlet
 import javax.servlet.ServletException
@@ -20,6 +22,8 @@ class HeapDumpServlet extends GenericServlet {
     HotSpotDiagnosticMXBean hotSpotDiagnosticMXBean
     Set<String> secretKeys = ((System.getenv("HEAPDUMP_TOKEN") ?: UUID.randomUUID().toString()).split(/,/)).findAll{ it } as Set
     AwsS3FileUploader s3Uploader
+    Cloud cloud
+    String fileNameBase = "heapdump"
 
     @Override
     void init() throws ServletException {
@@ -29,6 +33,16 @@ class HeapDumpServlet extends GenericServlet {
             s3Uploader = new AwsS3FileUploader(System.getenv("HEAPDUMP_AWS_ACCESS_KEY"), System.getenv("HEAPDUMP_AWS_SECRET_KEY"), System.getenv("HEAPDUMP_AWS_BUCKET"))
             println "Uploading to $s3Uploader.bucketName"
         }
+        try {
+            cloud = CloudFactory.newInstance().cloud
+        } catch(e) {
+        }
+        if(cloud) {
+            def appInfo=cloud.getApplicationInstanceInfo()
+            fileNameBase = "heapdump-${appInfo.appId}-${appInfo.instanceId}"
+        } else {
+            fileNameBase = "heapdump-${InetAddress.getLocalHost().getHostName()}"
+        }
     }
 
     @Override
@@ -37,7 +51,7 @@ class HeapDumpServlet extends GenericServlet {
         if((req.getParameter("TOKEN")?:'') in secretKeys) {
             out.println "Dumping..."
             out.flush()
-            File dumpFile=File.createTempFile("heapdump", ".bin")
+            File dumpFile=File.createTempFile("$fileNameBase-${new Date().format('yyyy-MM-dd-HH-mm')}", ".bin")
             dumpFile.delete()
             hotSpotDiagnosticMXBean.dumpHeap(dumpFile.getAbsolutePath(), true)
             out.println "Dumped to $dumpFile"
