@@ -1,6 +1,12 @@
 # java-buildpack-diagnostics-app
 Java Web App for doing a heapdump and uploading the file to Amazon S3
 
+## Installing app to your java-buildpack fork
+
+1. build war file with ```./gradlew war```
+2. copy build/libs/jbp-diagnostics.war to resources/tomcat/webapps/jbp-diagnostics.war in your forked java-buildpack. [See example|https://github.com/lhotari/java-buildpack/tree/jbp-diagnostics/resources/tomcat/webapps].
+3. create new branch in your java-buildpack and push it to a new branch so that you can easily reference it in your manifest.yml file with https://github.com/lhotari/java-buildpack.git#jbp-diagnostics type of syntax. 
+
 ## Amazon S3 setup
 
 ### S3 access keys
