@@ -20,23 +20,31 @@ import java.lang.management.ManagementFactory
 @WebServlet("/heapdump")
 class HeapDumpServlet extends GenericServlet {
     HotSpotDiagnosticMXBean hotSpotDiagnosticMXBean
-    Set<String> secretKeys = ((System.getenv("HEAPDUMP_TOKEN") ?: UUID.randomUUID().toString()).split(/,/)).findAll{ it } as Set
+    Set<String> secretKeys
     AwsS3FileUploader s3Uploader
     Cloud cloud
     String fileNameBase = "heapdump"
+    boolean logInfoToFiles = false
 
     @Override
     void init() throws ServletException {
-        hotSpotDiagnosticMXBean = ManagementFactory.getPlatformMXBeans(HotSpotDiagnosticMXBean.class).get(0);
-        println "HeapDumpServlet initializing. allowed TOKENs: ${secretKeys.join(', ')}"
-        if(System.getenv("HEAPDUMP_AWS_ACCESS_KEY")) {
-            s3Uploader = new AwsS3FileUploader(System.getenv("HEAPDUMP_AWS_ACCESS_KEY"), System.getenv("HEAPDUMP_AWS_SECRET_KEY"), System.getenv("HEAPDUMP_AWS_BUCKET"))
-            println "Uploading to $s3Uploader.bucketName"
-        }
         try {
             cloud = CloudFactory.newInstance().cloud
         } catch(e) {
         }
+        logInfoToFiles = cloud != null
+
+        hotSpotDiagnosticMXBean = ManagementFactory.getPlatformMXBeans(HotSpotDiagnosticMXBean.class).get(0);
+
+        secretKeys = ((System.getenv("HEAPDUMP_TOKEN") ?: UUID.randomUUID().toString()).split(/,/)).findAll{ it } as Set
+        println "HeapDumpServlet initializing. allowed TOKENs: ${secretKeys.join(', ')}"
+        if(logInfoToFiles) new File(System.getProperty("user.home"), ".heapdumpservlet.tokens").text = secretKeys.join(',')
+
+        if(System.getenv("HEAPDUMP_AWS_ACCESS_KEY")) {
+            s3Uploader = new AwsS3FileUploader(System.getenv("HEAPDUMP_AWS_ACCESS_KEY"), System.getenv("HEAPDUMP_AWS_SECRET_KEY"), System.getenv("HEAPDUMP_AWS_BUCKET"))
+            println "Uploading to $s3Uploader.bucketName"
+        }
+
         if(cloud) {
             def appInfo=cloud.getApplicationInstanceInfo()
             fileNameBase = "heapdump-${appInfo.appId}-${appInfo.instanceId}"
@@ -48,24 +56,35 @@ class HeapDumpServlet extends GenericServlet {
     @Override
     void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
         def out=((HttpServletResponse)res).getWriter()
-        if((req.getParameter("TOKEN")?:'') in secretKeys) {
-            out.println "Dumping..."
-            out.flush()
-            File dumpFile=File.createTempFile("$fileNameBase-${new Date().format('yyyy-MM-dd-HH-mm')}-", ".bin")
-            dumpFile.delete()
-            hotSpotDiagnosticMXBean.dumpHeap(dumpFile.getAbsolutePath(), true)
-            out.println "Dumped to $dumpFile"
-            out.flush()
-            if(s3Uploader) {
-                println "Uploading to AWS."
-                String filename = s3Uploader.gzipAndUploadFile(dumpFile)
-                String link = s3Uploader.generatePresignedUrl(filename)
-                out.println "Dump gzipped and uploaded to S3. Download from $link"
-                dumpFile.delete()
-            }
+        def accessToken = req.getParameter("TOKEN")
+        if(accessToken && accessToken in secretKeys) {
+            doHeapDump(out)
         } else {
             out << "NOT OK"
         }
         out.close()
+    }
+
+    protected synchronized void doHeapDump(PrintWriter out) {
+        out.println "Dumping..."
+        out.flush()
+        File dumpFile = File.createTempFile("$fileNameBase-${new Date().format('yyyy-MM-dd-HH-mm')}-", ".bin")
+        dumpFile.delete()
+        hotSpotDiagnosticMXBean.dumpHeap(dumpFile.getAbsolutePath(), true)
+        out.println "Dumped to $dumpFile"
+        out.flush()
+        if (s3Uploader) {
+            println "Uploading to AWS."
+            String filename = s3Uploader.gzipAndUploadFile(dumpFile)
+            String link = s3Uploader.generatePresignedUrl(filename)
+            out.println "Dump gzipped and uploaded to S3. Download from $link"
+            if(logInfoToFiles) {
+                new File(System.getProperty("user.home"), ".heapdumpservlet.dumps").withWriterAppend {
+                    it.write(link)
+                    it.write('\n')
+                }
+            }
+            dumpFile.delete()
+        }
     }
 }
