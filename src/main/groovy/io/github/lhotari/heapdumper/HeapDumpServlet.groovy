@@ -51,7 +51,7 @@ class HeapDumpServlet extends GenericServlet {
         if((req.getParameter("TOKEN")?:'') in secretKeys) {
             out.println "Dumping..."
             out.flush()
-            File dumpFile=File.createTempFile("$fileNameBase-${new Date().format('yyyy-MM-dd-HH-mm')}", ".bin")
+            File dumpFile=File.createTempFile("$fileNameBase-${new Date().format('yyyy-MM-dd-HH-mm')}-", ".bin")
             dumpFile.delete()
             hotSpotDiagnosticMXBean.dumpHeap(dumpFile.getAbsolutePath(), true)
             out.println "Dumped to $dumpFile"
