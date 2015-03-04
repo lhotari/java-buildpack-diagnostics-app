@@ -3,9 +3,37 @@ Java Web App for doing a heapdump and uploading the file to Amazon S3
 
 ## Installing app to your java-buildpack fork
 
+This application gets deployed in the Tomcat of your java-buildpack. It listens at /jbp-diagnostics if you follow these instructions to deploy it. 
+
 1. build war file with ```./gradlew war```
 2. copy build/libs/jbp-diagnostics.war to resources/tomcat/webapps/jbp-diagnostics.war in your forked java-buildpack. [See example](https://github.com/lhotari/java-buildpack/tree/jbp-diagnostics/resources/tomcat/webapps).
 3. create new branch in your java-buildpack and push it to a new branch so that you can easily reference it in your manifest.yml file with ```https://github.com/lhotari/java-buildpack.git#jbp-diagnostics``` type of syntax (branch name after ```#``` symbol). 
+## Requesting Heap dumps
+
+example requesting heap dumps with [httpie](http://httpie.org/)
+
+```http --timeout 600 https://my-app.cfapps.io/jbp-diagnostics/heapdump\?TOKEN\=THE_VALUE_OF_JBPDIAG_TOKEN_ENV```
+
+example response
+
+```
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Type: text/plain; charset=utf-8
+Date: Wed, 04 Mar 2015 15:48:02 GMT
+Server: Apache-Coyote/1.1
+X-Cf-Requestid: *someid*
+transfer-encoding: chunked
+
+Dumping...
+Dumped to /home/vcap/app/.java-buildpack/tomcat/temp/heapdump-*app_name*-*app_instance_id*-2015-03-04-15-48-208977084118580850.bin
+Dump gzipped and uploaded to S3. Download from https://myapp-jbpdiag-dumps.s3.amazonaws.com/heapdump-*app_name*-*app_instance_id*-2015-03-04-15-48-208977084118580850.bin.gz?AWSAccessKeyId=*secret*&Expires=1425656888&Signature=*secret*
+```
+
+You can then download the dump from s3 with the preauthorized link. It's valid for 48 hours by default.
+
+The dump urls get written to a file on CF, which you can access with
+```cf files app-name .heapdumpservlet.dumps```
 
 ## Amazon S3 setup
 
