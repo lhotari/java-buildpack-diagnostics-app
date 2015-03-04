@@ -40,6 +40,12 @@ You can then download the dump from s3 with the preauthorized link. It's valid f
 The dump urls get written to a file on CF, which you can access with
 ```cf files app-name .heapdumpservlet.dumps```
 
+## Adjusting disk quota for your application
+
+Dump files can be large. cf cli currently lacks support for changing disk quota. There is an [issue about it in cloudfoundry cli](https://github.com/cloudfoundry/cli/issues/102).
+See http://blog.troyastle.com/2014/03/setting-disk-quota-for-your-cloud.html for details about how to change it.
+The [gradle cloudfoundry plugin](https://github.com/cloudfoundry/cf-java-client/tree/master/cloudfoundry-gradle-plugin#configuring-the-plugin) has diskQuota setting and supports defining it.
+
 ## Amazon S3 setup
 
 ### S3 access keys
