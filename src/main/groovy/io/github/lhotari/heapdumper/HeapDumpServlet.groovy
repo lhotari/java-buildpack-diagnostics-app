@@ -14,6 +14,13 @@ import java.lang.management.ManagementFactory
 
 /**
  * Servlet that does a heapdump and uploads the file to S3
+ * Meant to be used for CloudFoundry applications
+ *
+ * expects that you have these environment variables specified in your CloudFoundry application instance
+ * JBPDIAG_AWS_BUCKET - the AWS S3 bucket to use
+ * JBPDIAG_AWS_ACCESS_KEY - the AWS access key id that has access to the S3 bucket
+ * JBPDIAG_AWS_SECRET_KEY - the AWS secret key for the previous
+ * JBPDIAG_TOKEN - secret token to request the heapdump via /heapdumper?TOKEN=thesecret_token
  *
  * Created by lari on 03/03/15.
  */
@@ -36,12 +43,12 @@ class HeapDumpServlet extends GenericServlet {
 
         hotSpotDiagnosticMXBean = ManagementFactory.getPlatformMXBeans(HotSpotDiagnosticMXBean.class).get(0);
 
-        secretKeys = ((System.getenv("HEAPDUMP_TOKEN") ?: UUID.randomUUID().toString()).split(/,/)).findAll{ it } as Set
+        secretKeys = ((System.getenv("JBPDIAG_TOKEN") ?: UUID.randomUUID().toString()).split(/,/)).findAll{ it } as Set
         println "HeapDumpServlet initializing. allowed TOKENs: ${secretKeys.join(', ')}"
         if(logInfoToFiles) new File(System.getProperty("user.home"), ".heapdumpservlet.tokens").text = secretKeys.join(',')
 
-        if(System.getenv("HEAPDUMP_AWS_ACCESS_KEY")) {
-            s3Uploader = new AwsS3FileUploader(System.getenv("HEAPDUMP_AWS_ACCESS_KEY"), System.getenv("HEAPDUMP_AWS_SECRET_KEY"), System.getenv("HEAPDUMP_AWS_BUCKET"))
+        if(System.getenv("JBPDIAG_AWS_ACCESS_KEY")) {
+            s3Uploader = new AwsS3FileUploader(System.getenv("JBPDIAG_AWS_ACCESS_KEY"), System.getenv("JBPDIAG_AWS_SECRET_KEY"), System.getenv("JBPDIAG_AWS_BUCKET"))
             println "Uploading to $s3Uploader.bucketName"
         }
 
