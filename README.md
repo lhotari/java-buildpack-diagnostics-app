@@ -9,6 +9,10 @@ This application gets deployed in the Tomcat of your java-buildpack. It listens 
 2. copy build/libs/jbp-diagnostics.war to resources/tomcat/webapps/jbp-diagnostics.war in your forked java-buildpack. [See example](https://github.com/lhotari/java-buildpack/tree/jbp-diagnostics/resources/tomcat/webapps).
 3. create new branch in your java-buildpack and push it to a new branch so that you can easily reference it in your manifest.yml file with ```https://github.com/lhotari/java-buildpack.git#jbp-diagnostics``` type of syntax (branch name after ```#``` symbol). 
 
+## Testing java-buildpack-diagnostics-app on CloudFoundry
+
+There is a simple Java web app to test this the diagnostics app, see https://github.com/lhotari/hello-jbp-diagnostics
+
 ## Requesting Heap dumps
 
 example requesting heap dumps with [httpie](http://httpie.org/)
