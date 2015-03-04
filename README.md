@@ -12,6 +12,16 @@ The app expects to find S3 access keys and bucket name in these environment vari
 
 Never use your root AWS key for this purpose. You should create a new user to be used just for this purpose.
 
+Here is a template for manifest.yml
+```
+    buildpack: https://github.com/lhotari/java-buildpack.git#jbp-diagnostics
+    env:
+        JBPDIAG_AWS_ACCESS_KEY: AWS_ACCESS_KEY_VALUE
+        JBPDIAG_AWS_SECRET_KEY: SECRET_KEY_VALUE
+        JBPDIAG_AWS_BUCKET: myapp-jdbdiag-dumps
+        JBPDIAG_TOKEN: some_random_token_that_gives_access_to_dumping
+```
+
 ### Create user in IAM console to be used for S3 in this diagnostics app
 
 1. go to [Amazon IAM Console](https://console.aws.amazon.com/iam/home)
