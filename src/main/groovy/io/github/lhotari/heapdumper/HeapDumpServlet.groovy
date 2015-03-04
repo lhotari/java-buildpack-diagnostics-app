@@ -75,7 +75,7 @@ class HeapDumpServlet extends GenericServlet {
     protected synchronized void doHeapDump(PrintWriter out) {
         out.println "Dumping..."
         out.flush()
-        File dumpFile = File.createTempFile("$fileNameBase-${new Date().format('yyyy-MM-dd-HH-mm')}-", ".bin")
+        File dumpFile = File.createTempFile("$fileNameBase-${new Date().format('yyyy-MM-dd-HH-mm')}-", ".hprof")
         dumpFile.delete()
         hotSpotDiagnosticMXBean.dumpHeap(dumpFile.getAbsolutePath(), true)
         out.println "Dumped to $dumpFile"
