@@ -21,6 +21,8 @@ dependencies {
 
     compile "org.springframework.cloud:spring-cloud-cloudfoundry-connector:1.1.1.RELEASE"
 
+    compile 'commons-io:commons-io:2.4'
+
     def tomcatVersion = '7.0.59'
     tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
            "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
