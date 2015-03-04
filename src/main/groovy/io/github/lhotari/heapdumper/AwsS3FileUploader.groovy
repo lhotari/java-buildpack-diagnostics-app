@@ -4,8 +4,10 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.regions.RegionUtils
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest
+import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.model.PutObjectRequest
 import org.joda.time.LocalDateTime
+import org.mule.util.compression.GZIPCompressorInputStream
 
 /**
  * Utility class for uploading files to AWS S3
@@ -35,7 +37,13 @@ class AwsS3FileUploader {
         return file.name
     }
 
-    def generatePresignedUrl(String objectKey) {
+    String gzipAndUploadFile(File file) {
+        String name =  "${file.name}.gz"
+        s3Client.putObject(new PutObjectRequest(bucketName, name, new GZIPCompressorInputStream(file.newInputStream()), new ObjectMetadata()))
+        return name
+    }
+
+    String generatePresignedUrl(String objectKey) {
         def request = new GeneratePresignedUrlRequest(bucketName, objectKey)
         request.setExpiration(LocalDateTime.now().plusHours(expiresInHours).toDate())
         s3Client.generatePresignedUrl(request)

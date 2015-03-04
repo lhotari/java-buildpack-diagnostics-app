@@ -58,8 +58,10 @@ class HeapDumpServlet extends GenericServlet {
             out.flush()
             if(s3Uploader) {
                 println "Uploading to AWS."
-                String link = s3Uploader.uploadFileAndPresignUrl(dumpFile)
-                out.println "Dump uploaded to S3. Download from $link"
+                String filename = s3Uploader.gzipAndUploadFile(dumpFile)
+                String link = s3Uploader.generatePresignedUrl(filename)
+                out.println "Dump gzipped and uploaded to S3. Download from $link"
+                dumpFile.delete()
             }
         } else {
             out << "NOT OK"
