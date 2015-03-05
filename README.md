@@ -50,6 +50,8 @@ CloudFoundry seems to limit disk_quota to 2048 MB . When the disk_quota is set t
 ```The app is invalid: disk_quota too much disk requested (must be less than 2048)```
 It won't be possible to get heap dumps for JVM apps with large heaps because of this hard limit in disk_quota.
 
+When you have control over the cloud controller config, you could make the limit higher by adjusting the  [```maximum_app_disk_in_mb``` setting in the cloud controller](https://github.com/cloudfoundry/cloud_controller_ng/blob/9b5dbac6c8925b08165200b39f1a3dc9247a41b3/lib/cloud_controller/config.rb#L308). The default value is 2048 .
+
 ## Amazon S3 setup
 
 ### S3 access keys
