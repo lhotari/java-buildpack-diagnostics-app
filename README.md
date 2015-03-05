@@ -2,7 +2,10 @@
 Java Web App for getting diagnostics information about the running application.
 Supports heapdump, threaddump and memory information.
 Heapdumps get uploaded to Amazon S3.
-Currently this solution is designed for Tomcat applications running with the java-buildpack. You could adapt it to other environments.
+
+Supports java-buildpack applications that use Tomcat as the deployment container.
+
+This application is designed to be added to a java-buildpack fork so that the diagnostics application gets deployed in the same Tomcat container as your actual application. You don't have to modify your application to use this. 
 
 There is also a separate shell script based solution for [getting heapdumps when an OOM occurs](https://github.com/lhotari/java-buildpack/commits/jbp-diagnostics-oom).
 
