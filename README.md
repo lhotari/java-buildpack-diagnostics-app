@@ -163,7 +163,8 @@ Here is a template for manifest.yml
     {
       "Sid": "allow-putobject-for-myapp.jdbdiag.user",
       "Action": [
-        "s3:PutObject"
+        "s3:PutObject",
+        "s3:GetObject"
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::myapp-jdbdiag-dumps/*",
@@ -176,3 +177,4 @@ Here is a template for manifest.yml
   ]
 }
 ```
+The s3:GetObject permission is required for generating the presigned download links. 
