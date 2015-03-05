@@ -1,5 +1,10 @@
 # java-buildpack-diagnostics-app
-Java Web App for doing a heapdump and uploading the file to Amazon S3
+Java Web App for getting diagnostics information about the running application.
+Supports heapdump, threaddump and memory information.
+Heapdumps get uploaded to Amazon S3.
+Currently this solution is designed for Tomcat applications running with the java-buildpack. You could adapt it to other environments.
+
+There is also a separate shell script based solution for [getting heapdumps when an OOM occurs](https://github.com/lhotari/java-buildpack/commits/jbp-diagnostics-oom).
 
 ## Installing app to your java-buildpack fork
 
