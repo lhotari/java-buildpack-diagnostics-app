@@ -72,7 +72,7 @@ Full thread dump OpenJDK 64-Bit Server VM (25.31-b07 mixed mode):
 .
 .
 .
-continues with dumps from all threads
+continues with stack traces from all threads
 ```
 
 ## Getting memory info
