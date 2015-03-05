@@ -3,7 +3,7 @@ Java Web App for doing a heapdump and uploading the file to Amazon S3
 
 ## Installing app to your java-buildpack fork
 
-This application gets deployed in the Tomcat of your java-buildpack. It listens at /jbp-diagnostics if you follow these instructions to deploy it. 
+This application gets deployed in the Tomcat of your java-buildpack. It listens at /jbp-diagnostics when you follow these install instructions. 
 
 1. build war file with ```./gradlew war```
 2. copy build/libs/jbp-diagnostics.war to resources/tomcat/webapps/jbp-diagnostics.war in your forked java-buildpack. [See example](https://github.com/lhotari/java-buildpack/tree/jbp-diagnostics/resources/tomcat/webapps).
@@ -17,22 +17,14 @@ There is a simple Java web app to test this the diagnostics app, see https://git
 
 example requesting heap dumps with [httpie](http://httpie.org/)
 
-```http --timeout 600 https://my-app.cfapps.io/jbp-diagnostics/heapdump\?TOKEN\=THE_VALUE_OF_JBPDIAG_TOKEN_ENV```
+```curl https://my-app.cfapps.io/jbp-diagnostics/heapdump\?TOKEN\=THE_VALUE_OF_JBPDIAG_TOKEN_ENV```
 
 example response
 
 ```
-HTTP/1.1 200 OK
-Connection: keep-alive
-Content-Type: text/plain; charset=utf-8
-Date: Wed, 04 Mar 2015 15:48:02 GMT
-Server: Apache-Coyote/1.1
-X-Cf-Requestid: *someid*
-transfer-encoding: chunked
-
 Dumping...
-Dumped to /home/vcap/app/.java-buildpack/tomcat/temp/heapdump-*app_name*-*app_instance_id*-2015-03-04-15-48-208977084118580850.bin
-Dump gzipped and uploaded to S3. Download from https://myapp-jbpdiag-dumps.s3.amazonaws.com/heapdump-*app_name*-*app_instance_id*-2015-03-04-15-48-208977084118580850.bin.gz?AWSAccessKeyId=*secret*&Expires=1425656888&Signature=*secret*
+Dumped to /home/vcap/app/.java-buildpack/tomcat/temp/heapdump-*app_name*-*app_instance_id*-2015-03-05-12-24-2970412494384667527.hprof
+Dump gzipped and uploaded to S3. Download from https://my-app-dumps.s3.amazonaws.com/heapdump-*app_name*-*app_instance_id*-2015-03-05-12-24-2970412494384667527.hprof.gz?AWSAccessKeyId=xxxx&Expires=1425731184&Signature=xxxx
 ```
 
 You can then download the dump from s3 with the preauthorized link. It's valid for 48 hours by default.
