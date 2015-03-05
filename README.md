@@ -15,7 +15,7 @@ There is a simple Java web app to test this the diagnostics app, see https://git
 
 ## Requesting Heap dumps
 
-example requesting heap dumps with [httpie](http://httpie.org/)
+example requesting heap dumps
 
 ```curl https://my-app.cfapps.io/jbp-diagnostics/heapdump\?TOKEN\=THE_VALUE_OF_JBPDIAG_TOKEN_ENV```
 
@@ -43,6 +43,65 @@ CloudFoundry seems to limit disk_quota to 2048 MB . When the disk_quota is set t
 It won't be possible to get heap dumps for JVM apps with large heaps because of this hard limit in disk_quota.
 
 When you have control over the cloud controller config, you could make the limit higher by adjusting the  [```maximum_app_disk_in_mb``` setting in the cloud controller](https://github.com/cloudfoundry/cloud_controller_ng/blob/9b5dbac6c8925b08165200b39f1a3dc9247a41b3/lib/cloud_controller/config.rb#L308). The default value is 2048 . The [```maximum_app_disk_in_mb``` setting](https://github.com/cloudfoundry/cloud_controller_ng/blob/9b5dbac6c8925b08165200b39f1a3dc9247a41b3/config/cloud_controller.yml#L37) in the default ```config/cloud_controller.yml``` file. 
+
+## Requesting a thread dump
+
+example requesting a thread dump
+
+```curl https://my-app.cfapps.io/jbp-diagnostics/threaddump\?TOKEN\=THE_VALUE_OF_JBPDIAG_TOKEN_ENV```
+
+response
+```
+2015-03-05 18:30:28
+Full thread dump OpenJDK 64-Bit Server VM (25.31-b07 mixed mode):
+
+"http-nio-61519-exec-10" #29 daemon prio=5 os_prio=0 tid=0x0000000002fab800 nid=0x43 waiting on condition [0x00007f4cd749b000]
+   java.lang.Thread.State: WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+	- parking to wait for  <0x00000000fe0188b0> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2039)
+	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:442)
+	at org.apache.tomcat.util.threads.TaskQueue.take(TaskQueue.java:103)
+	at org.apache.tomcat.util.threads.TaskQueue.take(TaskQueue.java:31)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1067)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:745)
+.
+.
+.
+continues with dumps from all threads
+```
+
+## Getting memory info
+
+example requesting memory info
+
+```curl https://my-app.cfapps.io/jbp-diagnostics/meminfo\?TOKEN\=THE_VALUE_OF_JBPDIAG_TOKEN_ENV```
+
+response
+```
+JVM memory usage
+Heap                                used:   88M committed:  753M max:  753M
+Non-Heap                            used:   40M committed:   41M max: 1399M
+
+Memory pools
+PS Eden Space                       used:   41M committed:  196M max:  196M
+PS Eden Space peak                  used:  196M committed:  196M max:  196M
+PS Survivor Space                   used:   32M committed:   32M max:   32M
+PS Survivor Space peak              used:   32M committed:   32M max:   32M
+PS Old Gen                          used:   13M committed:  524M max:  524M
+PS Old Gen peak                     used:   13M committed:  524M max:  524M
+Code Cache                          used:    8M committed:    8M max:  245M
+Code Cache peak                     used:    8M committed:    8M max:  245M
+Metaspace                           used:   28M committed:   29M max:  104M
+Metaspace peak                      used:   28M committed:   29M max:  104M
+Compressed Class Space              used:    3M committed:    3M max: 1048M
+Compressed Class Space peak         used:    3M committed:    3M max: 1048M
+```
+
 
 ## Amazon S3 setup
 
