@@ -27,7 +27,6 @@ import java.lang.management.ManagementFactory
 @WebServlet("/heapdump")
 class HeapDumpServlet extends GenericServlet {
     HotSpotDiagnosticMXBean hotSpotDiagnosticMXBean
-    Set<String> secretKeys
     AwsS3FileUploader s3Uploader
     Cloud cloud
     String fileNameBase = "heapdump"
@@ -43,7 +42,7 @@ class HeapDumpServlet extends GenericServlet {
 
         hotSpotDiagnosticMXBean = ManagementFactory.getPlatformMXBeans(HotSpotDiagnosticMXBean.class).get(0);
 
-        secretKeys = ((System.getenv("JBPDIAG_TOKEN") ?: UUID.randomUUID().toString()).split(/,/)).findAll{ it } as Set
+        def secretKeys = AccessControlService.instance.secretKeys
         println "HeapDumpServlet initializing. allowed TOKENs: ${secretKeys.join(', ')}"
         if(logInfoToFiles) new File(System.getProperty("user.home"), ".heapdumpservlet.tokens").text = secretKeys.join(',')
 
@@ -63,8 +62,7 @@ class HeapDumpServlet extends GenericServlet {
     @Override
     void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
         def out=((HttpServletResponse)res).getWriter()
-        def accessToken = req.getParameter("TOKEN")
-        if(accessToken && accessToken in secretKeys) {
+        if(AccessControlService.instance.isOperationAllowed(req, "heapdump")) {
             doHeapDump(out)
         } else {
             out << "NOT OK"
