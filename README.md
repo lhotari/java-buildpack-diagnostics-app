@@ -9,6 +9,12 @@ This application is designed to be added to a java-buildpack fork so that the di
 
 There is also a separate shell script based solution for [getting heapdumps when an OOM occurs](https://github.com/lhotari/java-buildpack/commits/jbp-diagnostics-oom).
 
+## java-buildpack issues to watch
+
+This solution is a hack while waiting for an "official" solution. These are the java-buildpack issues to track for more information:
+* https://github.com/cloudfoundry/java-buildpack/issues/146
+* https://github.com/cloudfoundry/java-buildpack/issues/70
+
 ## Installing app to your java-buildpack fork
 
 This application gets deployed in the Tomcat of your java-buildpack. It listens at /jbp-diagnostics when you follow these install instructions. 
