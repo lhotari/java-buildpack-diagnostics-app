@@ -1,4 +1,4 @@
-package io.github.lhotari.heapdumper
+package io.github.lhotari.jbpdiagnostics
 
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.regions.RegionUtils
@@ -8,7 +8,6 @@ import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.model.PutObjectRequest
 import groovy.transform.CompileStatic
 import org.apache.commons.io.IOUtils
-import org.apache.commons.io.input.CountingInputStream
 import org.apache.commons.io.output.CountingOutputStream
 import org.apache.commons.io.output.NullOutputStream
 import org.joda.time.LocalDateTime

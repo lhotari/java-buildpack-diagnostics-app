@@ -1,4 +1,4 @@
-package io.github.lhotari.heapdumper
+package io.github.lhotari.jbpdiagnostics
 
 import com.sun.management.HotSpotDiagnosticMXBean
 import org.springframework.cloud.Cloud
@@ -20,7 +20,7 @@ import java.lang.management.ManagementFactory
  * JBPDIAG_AWS_BUCKET - the AWS S3 bucket to use
  * JBPDIAG_AWS_ACCESS_KEY - the AWS access key id that has access to the S3 bucket
  * JBPDIAG_AWS_SECRET_KEY - the AWS secret key for the previous
- * JBPDIAG_TOKEN - secret token to request the heapdump via /heapdumper?TOKEN=thesecret_token
+ * JBPDIAG_TOKEN - secret token to request the heapdump via /heapdump?TOKEN=thesecret_token
  *
  * Created by lari on 03/03/15.
  */
