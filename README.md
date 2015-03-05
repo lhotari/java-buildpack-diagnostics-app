@@ -46,6 +46,10 @@ Dump files can be large. cf cli currently lacks support for changing disk quota.
 See http://blog.troyastle.com/2014/03/setting-disk-quota-for-your-cloud.html for details about how to change it.
 The [gradle cloudfoundry plugin](https://github.com/cloudfoundry/cf-java-client/tree/master/cloudfoundry-gradle-plugin#configuring-the-plugin) has diskQuota setting and supports defining it.
 
+CloudFoundry seems to limit disk_quota to 2048 MB . When the disk_quota is set to a higher value, the app won't start and this error message gets returned:
+```The app is invalid: disk_quota too much disk requested (must be less than 2048)```
+It won't be possible to get heap dumps for JVM apps with large heaps because of this hard limit in disk_quota.
+
 ## Amazon S3 setup
 
 ### S3 access keys
