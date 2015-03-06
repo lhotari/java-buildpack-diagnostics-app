@@ -18,7 +18,8 @@ import java.lang.management.MemoryUsage
  */
 @WebServlet("/meminfo")
 class MemoryInfoServlet extends GenericServlet {
-    static int BYTES_PER_MB = 1024 * 1000;
+    static int BYTES_PER_MB = 1024 * 1000
+    static int KB_PER_MB = 1024
 
     @Override
     void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
@@ -44,14 +45,51 @@ class MemoryInfoServlet extends GenericServlet {
             out << formatMemoryUsage(memoryPoolMXBean.name, memoryPoolMXBean.usage) << "\n"
             out << formatMemoryUsage(memoryPoolMXBean.name + " peak", memoryPoolMXBean.peakUsage) << "\n"
         }
+        out << "\n"
+        printOSMemory(out)
     }
 
     String formatMemoryUsage(String name, MemoryUsage memoryUsage) {
         String.format("%-35s used: %4dM committed: %4dM max: %4dM", name, toMB(memoryUsage.getUsed()), toMB(memoryUsage.getCommitted()), toMB(memoryUsage.getMax()));
     }
 
+    void printOSMemory(PrintWriter out) {
+        String currentPid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
+
+        def psfields = ["pid","ppid","rss","vsz","pmem","cpu","cputime","comm"]
+        Process p = ["/bin/ps", "-o", psfields.join(','), "-e"].execute()
+        def psOutput=p.text
+        int rssTotal=0
+        int vszTotal=0
+        int currentRss=0
+        int currentVsz=0
+        psOutput.eachLine { String line, int linenum ->
+            if(linenum > 0) {
+                def fields=line.split(/\s+/, psfields.size())
+                int rss = fields[2] as int
+                int vsz = fields[3] as int
+                if(currentPid == fields[0]) {
+                    currentRss = rss
+                    currentVsz = vsz
+                }
+                rssTotal += rss
+                vszTotal += vsz
+            }
+        }
+
+        out << "OS memory report\n"
+        out << "Resident set size (rss): ${kbToMB(currentRss)}M\n"
+        out << "Virtual size (vsz): ${kbToMB(currentVsz)}M\n"
+        out << "\n"
+        out << psOutput
+    }
+
     int toMB(Number number) {
         (number / BYTES_PER_MB) as Integer
+    }
+
+    int kbToMB(Number number) {
+        (number / KB_PER_MB) as Integer
     }
 }
 
