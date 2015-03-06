@@ -69,7 +69,7 @@ class MemoryInfoServlet extends GenericServlet {
         def psCommand = ["/bin/ps", "-o", psfields.join(','), "-e", psSortOption]
         Process p = psCommand.execute()
         def psOutput=p.text
-        if(p.exitValue() == 0 && psOutput) {
+        if(p.waitFor() == 0 && psOutput) {
             int rssTotal = 0
             int currentRss = 0
             int currentVsz = 0
