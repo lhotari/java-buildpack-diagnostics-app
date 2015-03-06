@@ -69,30 +69,41 @@ class MemoryInfoServlet extends GenericServlet {
         def psCommand = ["/bin/ps", "-o", psfields.join(','), "-e", psSortOption]
         Process p = psCommand.execute()
         def psOutput=p.text
-        int rssTotal=0
-        int currentRss=0
-        int currentVsz=0
-        psOutput.eachLine { String line, int linenum ->
-            if(linenum > 0) {
-                def fields=line.split(/\s+/, psfields.size())
-                int rss = fields[2] as int
-                int vsz = fields[3] as int
-                if(currentPid == fields[0]) {
-                    currentRss = rss
-                    currentVsz = vsz
+        if(p.exitValue() == 0 && psOutput) {
+            int rssTotal = 0
+            int currentRss = 0
+            int currentVsz = 0
+            psOutput.eachLine { String line, int linenum ->
+                if (linenum > 0) {
+                    def fields = line.split(/\s+/, psfields.size())
+                    int rss = fields[2] as int
+                    int vsz = fields[3] as int
+                    if (currentPid == fields[0]) {
+                        currentRss = rss
+                        currentVsz = vsz
+                    }
+                    rssTotal += rss
                 }
-                rssTotal += rss
             }
+
+            out << "OS memory report\n\n"
+            out << "Memory usage of current process (pid $currentPid):\n"
+            out << "Resident set size (rss): ${kbToMB(currentRss)}M\n"
+            out << "Virtual size (vsz): ${kbToMB(currentVsz)}M\n"
+            out << "\n"
+            out << "Total RSS of all listed processes: ${kbToMB(rssTotal)}M - ${rssTotal}K\n"
+            out << "\n"
+            if(new File("/usr/bin/free").exists()) {
+                def freeCmd = "/usr/bin/free -m"
+                def freeOutput = freeCmd.execute().text
+                if(freeOutput) {
+                    out << "\n\n\$ $freeCmd\n" << freeOutput << "\n"
+                }
+            }
+            out << "\$ ${psCommand.join(' ')}\n\n"
+            out << psOutput
         }
 
-        out << "OS memory report\n"
-        out << "Resident set size (rss): ${kbToMB(currentRss)}M\n"
-        out << "Virtual size (vsz): ${kbToMB(currentVsz)}M\n"
-        out << "\n"
-        out << "Total RSS of listed processes: ${kbToMB(rssTotal)}M - ${rssTotal}K\n"
-        out << "\n"
-        out << "${psCommand.join(' ')}\n\n"
-        out << psOutput
     }
 
     int toMB(Number number) {
