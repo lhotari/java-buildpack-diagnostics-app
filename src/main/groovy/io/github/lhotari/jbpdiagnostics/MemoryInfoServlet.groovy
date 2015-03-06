@@ -65,7 +65,8 @@ class MemoryInfoServlet extends GenericServlet {
         String currentPid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
 
         def psfields = ["pid","ppid","rss","vsz","pmem","cpu","cputime","comm"]
-        def psCommand = ["/bin/ps", "-o", psfields.join(','), "-e", "-m"]
+        def psSortOption = (System.properties['os.name'] =~ /Mac/) ? "-m" : "--sort=-rss"
+        def psCommand = ["/bin/ps", "-o", psfields.join(','), "-e", psSortOption]
         Process p = psCommand.execute()
         def psOutput=p.text
         int rssTotal=0
