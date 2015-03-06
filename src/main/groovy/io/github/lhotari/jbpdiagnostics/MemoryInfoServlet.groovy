@@ -1,5 +1,9 @@
 package io.github.lhotari.jbpdiagnostics
 
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
+
 import javax.servlet.GenericServlet
 import javax.servlet.ServletException
 import javax.servlet.ServletRequest
@@ -35,6 +39,10 @@ class MemoryInfoServlet extends GenericServlet {
     protected synchronized void doMemInfo(PrintWriter out) {
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean()
 
+        DateTime dt = new DateTime();
+        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+        out << fmt.print(dt) << '\n'
+
         out << "JVM memory usage\n"
         MemoryUsage heap = memoryMXBean.getHeapMemoryUsage();
         out << formatMemoryUsage("Heap", memoryMXBean.getHeapMemoryUsage()) << "\n";
@@ -57,10 +65,10 @@ class MemoryInfoServlet extends GenericServlet {
         String currentPid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
 
         def psfields = ["pid","ppid","rss","vsz","pmem","cpu","cputime","comm"]
-        Process p = ["/bin/ps", "-o", psfields.join(','), "-e"].execute()
+        def psCommand = ["/bin/ps", "-o", psfields.join(','), "-e", "-m"]
+        Process p = psCommand.execute()
         def psOutput=p.text
         int rssTotal=0
-        int vszTotal=0
         int currentRss=0
         int currentVsz=0
         psOutput.eachLine { String line, int linenum ->
@@ -73,7 +81,6 @@ class MemoryInfoServlet extends GenericServlet {
                     currentVsz = vsz
                 }
                 rssTotal += rss
-                vszTotal += vsz
             }
         }
 
@@ -81,6 +88,9 @@ class MemoryInfoServlet extends GenericServlet {
         out << "Resident set size (rss): ${kbToMB(currentRss)}M\n"
         out << "Virtual size (vsz): ${kbToMB(currentVsz)}M\n"
         out << "\n"
+        out << "Total RSS of listed processes: ${kbToMB(rssTotal)}M - ${rssTotal}K\n"
+        out << "\n"
+        out << "${psCommand.join(' ')}\n\n"
         out << psOutput
     }
 
