@@ -70,29 +70,7 @@ class MemoryInfoServlet extends GenericServlet {
         Process p = psCommand.execute()
         def psOutput=p.text
         if(p.waitFor() == 0 && psOutput) {
-            int rssTotal = 0
-            int currentRss = 0
-            int currentVsz = 0
-            psOutput.eachLine { String line, int linenum ->
-                if (linenum > 0) {
-                    def fields = line.split(/\s+/, psfields.size())
-                    int rss = fields[2] as int
-                    int vsz = fields[3] as int
-                    if (currentPid == fields[0]) {
-                        currentRss = rss
-                        currentVsz = vsz
-                    }
-                    rssTotal += rss
-                }
-            }
-
-            out << "OS memory report\n\n"
-            out << "Memory usage of current process (pid $currentPid):\n"
-            out << "Resident set size (rss): ${kbToMB(currentRss)}M\n"
-            out << "Virtual size (vsz): ${kbToMB(currentVsz)}M\n"
-            out << "\n"
-            out << "Total RSS of all listed processes: ${kbToMB(rssTotal)}M - ${rssTotal}K\n"
-            out << "\n"
+            printMemSummary(out, psOutput, psfields.size(), currentPid)
             if(new File("/usr/bin/free").exists()) {
                 def freeCmd = "/usr/bin/free -m"
                 def freeOutput = freeCmd.execute().text
@@ -104,6 +82,32 @@ class MemoryInfoServlet extends GenericServlet {
             out << psOutput
         }
 
+    }
+
+    protected void printMemSummary(PrintWriter out, String psOutput, int numberOfPsFields, String currentPid) {
+        int rssTotal = 0
+        int currentRss = 0
+        int currentVsz = 0
+        psOutput.eachLine { String line, int linenum ->
+            if (linenum > 0) {
+                def fields = line.trim().split(/\s+/, numberOfPsFields)
+                int rss = fields[2] as int
+                int vsz = fields[3] as int
+                if (currentPid == fields[0]) {
+                    currentRss = rss
+                    currentVsz = vsz
+                }
+                rssTotal += rss
+            }
+        }
+
+        out << "OS memory report\n\n"
+        out << "Memory usage of current process (pid $currentPid):\n"
+        out << "Resident set size (rss): ${kbToMB(currentRss)}M\n"
+        out << "Virtual size (vsz): ${kbToMB(currentVsz)}M\n"
+        out << "\n"
+        out << "Total RSS of all listed processes: ${kbToMB(rssTotal)}M - ${rssTotal}K\n"
+        out << "\n"
     }
 
     int toMB(Number number) {
