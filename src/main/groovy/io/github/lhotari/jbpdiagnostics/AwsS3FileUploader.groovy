@@ -48,13 +48,16 @@ class AwsS3FileUploader {
             long contentLength = calculateGzippedLength(file)
             def metadata = new ObjectMetadata()
             metadata.setContentLength(contentLength)
-            s3Client.putObject(new PutObjectRequest(bucketName, name, createGzipCompressingInputStream(file), metadata))
+            createGzipCompressingInputStream(file).withStream { InputStream input ->
+                s3Client.putObject(new PutObjectRequest(bucketName, name, input, metadata))
+            }
         } else {
             File tempFile = new File(file.getParentFile(), name)
             try {
-                tempFile.withOutputStream {
-                    OutputStream output
-                    IOUtils.copy(createGzipCompressingInputStream(file), output)
+                tempFile.withOutputStream { OutputStream output ->
+                    createGzipCompressingInputStream(file).withStream { InputStream input ->
+                        IOUtils.copy(input, output)
+                    }
                 }
                 s3Client.putObject(new PutObjectRequest(bucketName, name, tempFile))
             } finally {
@@ -66,7 +69,9 @@ class AwsS3FileUploader {
 
     long calculateGzippedLength(File file) {
         CountingOutputStream countingOutput = new CountingOutputStream(new NullOutputStream())
-        IOUtils.copy(createGzipCompressingInputStream(file), countingOutput)
+        createGzipCompressingInputStream(file).withStream { InputStream input ->
+            IOUtils.copy(input, countingOutput)
+        }
         countingOutput.getByteCount()
     }
 
