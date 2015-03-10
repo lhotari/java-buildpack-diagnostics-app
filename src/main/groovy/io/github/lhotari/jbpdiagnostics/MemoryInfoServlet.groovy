@@ -1,8 +1,10 @@
 package io.github.lhotari.jbpdiagnostics
 
 import org.joda.time.DateTime
+import org.joda.time.Period
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.format.ISOPeriodFormat
 
 import javax.servlet.GenericServlet
 import javax.servlet.ServletException
@@ -14,6 +16,7 @@ import java.lang.management.ManagementFactory
 import java.lang.management.MemoryMXBean
 import java.lang.management.MemoryPoolMXBean
 import java.lang.management.MemoryUsage
+import java.lang.management.RuntimeMXBean
 
 /**
  * Servlet that shows memory usage information and returns it as a response
@@ -37,13 +40,19 @@ class MemoryInfoServlet extends GenericServlet {
     }
 
     protected synchronized void doMemInfo(PrintWriter out) {
-        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean()
 
         DateTime dt = new DateTime();
         DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
         out << fmt.print(dt) << '\n'
 
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean()
+        out << "JVM start time "
+        out << fmt.print(new DateTime(runtimeMXBean.getStartTime()))
+        out << "\n"
+        out << "JVM uptime " <<  ISOPeriodFormat.standard().print(new Period(runtimeMXBean.getUptime())) << "\n\n"
+
         out << "JVM memory usage\n"
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean()
         MemoryUsage heap = memoryMXBean.getHeapMemoryUsage();
         out << formatMemoryUsage("Heap", memoryMXBean.getHeapMemoryUsage()) << "\n";
         out << formatMemoryUsage("Non-Heap", memoryMXBean.getNonHeapMemoryUsage())  << "\n";
