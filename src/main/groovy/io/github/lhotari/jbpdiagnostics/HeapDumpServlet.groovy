@@ -63,19 +63,20 @@ class HeapDumpServlet extends GenericServlet {
     void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
         def out=((HttpServletResponse)res).getWriter()
         if(AccessControlService.instance.isOperationAllowed(req, "heapdump")) {
-            doHeapDump(out)
+            boolean live = "false".equals(req.getParameter("live")) ? false : true
+            doHeapDump(out, live)
         } else {
             out << "NOT OK"
         }
         out.close()
     }
 
-    protected synchronized void doHeapDump(PrintWriter out) {
-        out.println "Dumping..."
+    protected synchronized void doHeapDump(PrintWriter out, boolean live) {
+        out.println "Dumping... live=${live}"
         out.flush()
         File dumpFile = File.createTempFile("$fileNameBase-${new Date().format('yyyy-MM-dd-HH-mm')}-", ".hprof")
         dumpFile.delete()
-        hotSpotDiagnosticMXBean.dumpHeap(dumpFile.getAbsolutePath(), true)
+        hotSpotDiagnosticMXBean.dumpHeap(dumpFile.getAbsolutePath(), live)
         out.println "Dumped to $dumpFile"
         out.flush()
         if (s3Uploader) {
