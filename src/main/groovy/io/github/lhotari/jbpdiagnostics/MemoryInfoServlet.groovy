@@ -89,6 +89,13 @@ class MemoryInfoServlet extends GenericServlet {
             }
             out << "\$ ${psCommand.join(' ')}\n\n"
             out << psOutput
+            if(new File("/usr/bin/pmap").exists()) {
+                def pmapCmd = "/usr/bin/pmap -x $currentPid"
+                def pmapOutput = pmapCmd.execute().text
+                if(pmapOutput) {
+                    out << "\n\n\$ $pmapCmd\n" << pmapOutput << "\n"
+                }
+            }
         }
 
     }
