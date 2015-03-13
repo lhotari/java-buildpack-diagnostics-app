@@ -71,7 +71,7 @@ class MemoryInfoServlet extends GenericServlet {
     }
 
     void printOSMemory(PrintWriter out) {
-        String currentPid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
+        int currentPid = DiagUtils.getCurrentProcessId()
 
         def psfields = ["pid","ppid","rss","vsz","pmem","cpu","cputime","comm"]
         def psSortOption = (System.properties['os.name'] =~ /Mac/) ? "-m" : "--sort=-rss"
@@ -100,7 +100,7 @@ class MemoryInfoServlet extends GenericServlet {
 
     }
 
-    protected void printMemSummary(PrintWriter out, String psOutput, int numberOfPsFields, String currentPid) {
+    protected void printMemSummary(PrintWriter out, String psOutput, int numberOfPsFields, int currentPid) {
         int rssTotal = 0
         int currentRss = 0
         int currentVsz = 0
@@ -109,7 +109,7 @@ class MemoryInfoServlet extends GenericServlet {
                 def fields = line.trim().split(/\s+/, numberOfPsFields)
                 int rss = fields[2] as int
                 int vsz = fields[3] as int
-                if (currentPid == fields[0]) {
+                if (currentPid.toString() == fields[0]) {
                     currentRss = rss
                     currentVsz = vsz
                 }
