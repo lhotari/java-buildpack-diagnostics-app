@@ -26,7 +26,7 @@ class ListOfOpenFilesServlet extends GenericServlet {
     }
 
     protected synchronized void doLsof(PrintWriter out) {
-        def lsofOutput = "lsof -p ${DiagUtils.currentProcessId}".execute().text
+        def lsofOutput = "lsof -n -p ${DiagUtils.currentProcessId}".execute().text
         out << lsofOutput
     }
 }
