@@ -96,6 +96,11 @@ class MemoryInfoServlet extends GenericServlet {
                     out << "\n\n\$ $pmapCmd\n" << pmapOutput << "\n"
                 }
             }
+            out << "\n"
+            def procStatusFile = new File("/proc/$currentPid/status")
+            if(procStatusFile.exists()) {
+                out << procStatusFile.text
+            }
         }
 
     }
