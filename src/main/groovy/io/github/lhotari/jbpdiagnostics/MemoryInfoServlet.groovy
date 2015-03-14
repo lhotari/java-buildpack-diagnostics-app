@@ -85,7 +85,7 @@ class MemoryInfoServlet extends GenericServlet {
         int currentPid = DiagUtils.getCurrentProcessId()
 
         def psfields = ["pid","ppid","rss","vsz","pmem","cpu","cputime","comm"]
-        def psSortOption = (System.properties['os.name'] =~ /Mac/) ? "-m" : "--sort=-rss"
+        def psSortOption = DiagUtils.isMacOs() ? "-m" : "--sort=-rss"
         def psCommand = ["/bin/ps", "-o", psfields.join(','), "-e", psSortOption]
         Process p = psCommand.execute()
         def psOutput=p.text

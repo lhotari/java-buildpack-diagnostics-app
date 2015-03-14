@@ -9,4 +9,8 @@ class DiagUtils {
     public static int getCurrentProcessId() {
         ManagementFactory.getRuntimeMXBean().getName().split("@")[0] as int
     }
+
+    public static boolean isMacOs() {
+        System.properties['os.name'] =~ /Mac/
+    }
 }

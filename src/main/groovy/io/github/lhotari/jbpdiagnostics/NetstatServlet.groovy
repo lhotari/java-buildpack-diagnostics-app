@@ -26,7 +26,7 @@ class NetstatServlet extends GenericServlet {
     }
 
     protected synchronized void doNetstat(ServletRequest req, PrintWriter out) {
-        def params = "-anp"
+        def params = DiagUtils.macOs ? "-an" : "-anp"
         if(req.getParameter("stat")) {
             params = "-s"
         }
