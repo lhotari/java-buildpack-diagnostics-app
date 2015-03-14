@@ -1,5 +1,6 @@
 package io.github.lhotari.jbpdiagnostics
 
+import com.sun.management.UnixOperatingSystemMXBean
 import org.joda.time.DateTime
 import org.joda.time.Period
 import org.joda.time.format.DateTimeFormatter
@@ -16,6 +17,7 @@ import java.lang.management.ManagementFactory
 import java.lang.management.MemoryMXBean
 import java.lang.management.MemoryPoolMXBean
 import java.lang.management.MemoryUsage
+import java.lang.management.OperatingSystemMXBean
 import java.lang.management.RuntimeMXBean
 
 /**
@@ -51,6 +53,15 @@ class MemoryInfoServlet extends GenericServlet {
         out << "\n"
         out << "JVM uptime " <<  ISOPeriodFormat.standard().print(new Period(runtimeMXBean.getUptime())) << "\n\n"
 
+        OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean()
+        out << "CPU count: ${osMXBean.availableProcessors}\n"
+        if(osMXBean instanceof UnixOperatingSystemMXBean) {
+            UnixOperatingSystemMXBean unixOsMXBean = (UnixOperatingSystemMXBean)osMXBean
+            out << "Open files: ${unixOsMXBean.openFileDescriptorCount} / ${unixOsMXBean.maxFileDescriptorCount}\n"
+            out << "Committed virtual memory: ${toMB(unixOsMXBean.committedVirtualMemorySize)}M\n"
+        }
+
+        out << "\n"
         out << "JVM memory usage\n"
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean()
         MemoryUsage heap = memoryMXBean.getHeapMemoryUsage();
