@@ -146,6 +146,7 @@ There are more details in the source code:
 * [TmateSshServlet](https://github.com/lhotari/java-buildpack-diagnostics-app/blob/master/src/main/groovy/io/github/lhotari/jbpdiagnostics/TmateSshServlet.groovy) - servlet that handles the tmatessh url endpoint
 * [tmate-server.sh](https://github.com/lhotari/java-buildpack-diagnostics-app/blob/master/src/main/resources/tmate-server.sh) - script for tmate daemon
 * [tmate.tar.gz](https://github.com/lhotari/java-buildpack-diagnostics-app/blob/master/src/main/resources/tmate.tar.gz) - compiled tmate binary
+* [building tmate in a docker container](tmate.md) - instructions how to build the `tmate` binary that is in `tmate.tar.gz` file
 
 
 
