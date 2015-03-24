@@ -3,6 +3,8 @@ Java Web App for getting diagnostics information about the running application.
 Supports heapdump, threaddump and memory information.
 Heapdumps get uploaded to Amazon S3.
 
+This app also bundles [`tmate`](http://tmate.io) for getting ssh command-line access to the deployment container. 
+
 Supports java-buildpack applications that use Tomcat as the deployment container.
 
 This application is designed to be added to a java-buildpack fork so that the diagnostics application gets deployed in the same Tomcat container as your actual application. You don't have to modify your application to use this. 
@@ -115,6 +117,24 @@ Metaspace peak                      used:   28M committed:   29M max:  104M
 Compressed Class Space              used:    3M committed:    3M max: 1048M
 Compressed Class Space peak         used:    3M committed:    3M max: 1048M
 ```
+
+## SSH access
+
+`tmate` is not started by default. There is an url endpoint for installing and starting `tmate` in the container.
+
+starting / printing ssh host for running tmate session:
+
+```curl 'https://MYAPP.cfapps.io/jbp-diagnostics/tmatessh?TOKEN=some_token'```
+
+
+stopping:
+
+```curl 'https://MYAPP.cfapps.io/jbp-diagnostics/tmatessh?TOKEN=some_token&action=stop'```
+
+
+status of running tmate:
+
+```curl 'https://MYAPP.cfapps.io/jbp-diagnostics/tmatessh?TOKEN=some_token&action=status'```
 
 
 ## Amazon S3 setup
