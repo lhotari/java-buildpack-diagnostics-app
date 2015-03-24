@@ -120,9 +120,14 @@ Compressed Class Space peak         used:    3M committed:    3M max: 1048M
 
 ## SSH access
 
-`tmate` is not started by default. There is an url endpoint for installing and starting `tmate` in the container.
+This app also bundles [`tmate`](http://tmate.io) for getting ssh command-line access to the deployment container.
+The bundled `tmate` binary has been compiled for Ubuntu 10.04 so that it can be used in CloudFoundry. 
 
-starting / printing ssh host for running tmate session:
+Please note that the traffic gets routed via [`tmate`](http://tmate.io) servers. It is possible to modify the solution to use your own [`tmate-slave`](https://github.com/nviennot/tmate-slave).
+
+The `tmate` client in `java-buildpack-diagnostics-app` is not installed and started by default. There is an url endpoint for installing and starting `tmate` in the container.
+
+installs, starts `tmate` in daemon mode and shows the ssh host for the running tmate session:
 
 ```curl 'https://MYAPP.cfapps.io/jbp-diagnostics/tmatessh?TOKEN=some_token'```
 
@@ -135,6 +140,14 @@ stopping:
 status of running tmate:
 
 ```curl 'https://MYAPP.cfapps.io/jbp-diagnostics/tmatessh?TOKEN=some_token&action=status'```
+
+
+There are more details in the source code:
+* [TmateSshServlet](https://github.com/lhotari/java-buildpack-diagnostics-app/blob/master/src/main/groovy/io/github/lhotari/jbpdiagnostics/TmateSshServlet.groovy) - servlet that handles the tmatessh url endpoint
+* [tmate-server.sh](https://github.com/lhotari/java-buildpack-diagnostics-app/blob/master/src/main/resources/tmate-server.sh) - script for tmate daemon
+* [tmate.tar.gz](https://github.com/lhotari/java-buildpack-diagnostics-app/blob/master/src/main/resources/tmate.tar.gz) - compiled tmate binary
+
+
 
 
 ## Amazon S3 setup
