@@ -59,7 +59,7 @@ cp /opt/tmate/bin/tmate /opt/tmate/lib/libevent-2.0.so.5 /opt/tmate/tmate-binary
 Copying timeout command to be used in tmate-server.sh script for timeout control
 ```
 cd /tmp
-wget https://launchpad.net/ubuntu/+source/tct/1.19-1/+build/1332294/+files/timeout_1.19-1_amd64.deb
+wget http://archive.ubuntu.com/ubuntu/pool/universe/t/tct/timeout_1.19-1_amd64.deb
 dpkg-deb -x timeout_1.19-1_amd64.deb .
 cp /tmp/usr/bin/timeout /opt/tmate/tmate-binary/
 ```
