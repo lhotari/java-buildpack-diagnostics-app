@@ -1,11 +1,9 @@
 #!/bin/bash
 # script for launching tmate >= 1.8.10 in server mode
-# written for Ubuntu 10.04 since CloudFoundry execution environment uses it
+# written for Ubuntu 14.04 since CloudFoundry cflinuxfs2 execution environment uses it
 # author: Lari Hotari , https://github.com/lhotari
 #
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-# Ubuntu 10.04 requires newer libevent version, assume that the libraries are in the script directory
-export LD_LIBRARY_PATH=$SCRIPTDIR
 TMATE="$SCRIPTDIR/tmate -S /tmp/tmate.sock"
 
 case "$1" in
@@ -19,7 +17,7 @@ case "$1" in
             [ ! -d $SSH_HOME ] && mkdir $SSH_HOME && chmod 0700 $SSH_HOME
             [ ! -f $SSH_HOME/id_rsa ] && ssh-keygen -q -t rsa -f $SSH_HOME/id_rsa -N ""
             $TMATE -vvv new-session -d 2>&1
-            $SCRIPTDIR/timeout 15 $TMATE wait tmate-ready 2>&1
+            timeout 15 $TMATE wait tmate-ready 2>&1
             $TMATE display -p '#{tmate_ssh}' 2>&1
         else
             echo $tmate_ssh
