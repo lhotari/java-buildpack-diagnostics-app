@@ -16,7 +16,7 @@ case "$1" in
             SSH_HOME=`dirname $SCRIPTDIR`/.ssh
             [ ! -d $SSH_HOME ] && mkdir $SSH_HOME && chmod 0700 $SSH_HOME
             [ ! -f $SSH_HOME/id_rsa ] && ssh-keygen -q -t rsa -f $SSH_HOME/id_rsa -N ""
-            $TMATE -vvv new-session -d 2>&1
+            $TMATE new-session -d 2>&1
             timeout 15 $TMATE wait tmate-ready 2>&1
             $TMATE display -p '#{tmate_ssh}' 2>&1
         else
