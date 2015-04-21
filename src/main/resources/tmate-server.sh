@@ -4,6 +4,8 @@
 # author: Lari Hotari , https://github.com/lhotari
 #
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# use libevent-2.0.so.5 library from script directory
+export LD_LIBRARY_PATH=$SCRIPTDIR
 TMATE="$SCRIPTDIR/tmate -S /tmp/tmate.sock"
 
 case "$1" in

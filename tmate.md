@@ -61,6 +61,8 @@ Copy the required files inside the container to a single directory for transfer
 ```
 mkdir /opt/tmate/tmate-binary
 cp /opt/tmate/bin/tmate /opt/tmate/tmate-binary/
+# only for cflinuxfs2
+cp /usr/lib/x86_64-linux-gnu/libevent-2.0.so.5 /opt/tmate/tmate-binary/
 # only for lucid64
 cp /opt/tmate/lib/libevent-2.0.so.5 /opt/tmate/tmate-binary/
 ```
@@ -75,7 +77,7 @@ cp /tmp/usr/bin/timeout /opt/tmate/tmate-binary/
 
 Copying files from docker container (run command on host)
 ```docker cp cfbuilder:/opt/tmate/tmate-binary .```
-You should then have a directory `tmate-binary` with 3 files inside it: `tmate`, `libevent-2.0.so.5` and `timeout` (for lucid64) or 1 file on cflinuxfs2.
+You should then have a directory `tmate-binary` with files inside it: `tmate`, `libevent-2.0.so.5` and `timeout` (only for lucid64).
 
 update tmate.tar.gz file included in `java-buildpack-diagnostics-app`:
 ```
